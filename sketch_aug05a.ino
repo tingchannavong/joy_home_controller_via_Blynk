@@ -1,21 +1,20 @@
 #define BLYNK_PRINT Serial
 
-#define BLYNK_TEMPLATE_ID "xxxxx"
+#define BLYNK_TEMPLATE_ID "TMPL6lscGEXIk"
 #define BLYNK_TEMPLATE_NAME "Joy Home Controller"
-#define BLYNK_AUTH_TOKEN "xx-xxx"
+#define BLYNK_AUTH_TOKEN "xx-xx"
 
-#include <WiFi.h>
-#include <WiFiClient.h>
-#include <BlynkSimpleEsp32.h>
+#include <ESP8266WiFi.h>
+#include <BlynkSimpleEsp8266.h>
 #include <DHT.h>
 
-char auth[] = "xx-xxx"; // Blynk authentication token
-char ssid[] = "xxxx"; // WiFi SSID
-char pass[] = "xxxxxxx"; // WiFi password
+char auth[] = "xx-xx"; // Blynk authentication token
+char ssid[] = "xx"; // WiFi SSID
+char pass[] = "xxxx"; // WiFi password
 
-const int relayPin1 = 18; // Relay for light source connected to GPIO18 
-const int relayPin2 = 21; // Relay for humidifier connected to GPIO21
-const int DHTPin = 26; // DHT sensor connected to GPIO26 
+const int relayPin1 = 2; // Relay for light source connected to D2 
+const int relayPin2 = 6; // Relay for humidifier connected to D6 
+const int DHTPin = 8; // DHT sensor connected to D8 
 
 DHT dht(DHTPin, DHT22);
 
@@ -67,12 +66,16 @@ BLYNK_WRITE(V1) // Virtual pin V1 for light source relay
 {
   int pinValue = param.asInt(); // Get the value from the Blynk app
   digitalWrite(relayPin1, pinValue);
+  Serial.println("The light is turning");
+  Serial.println(pinValue);
 }
 
 BLYNK_WRITE(V2) // Virtual pin V2 for humidifier relay
 {
   int pinValue = param.asInt(); // Get the value from the Blynk app
   digitalWrite(relayPin2, pinValue);
+  Serial.println("The humidifier is turning");
+  Serial.println(pinValue);
 }
 
 void sendSensor() {
@@ -85,7 +88,11 @@ void sendSensor() {
   }
 
   Blynk.virtualWrite(V5, t); // Virtual pin V5 for temperature
+  Serial.println("The temperature is");
+  Serial.println(t);
   Blynk.virtualWrite(V6, h); // Virtual pin V6 for humidity
+  Serial.println("The humidity is");
+  Serial.println(h);
 }
 
 void loop() {
