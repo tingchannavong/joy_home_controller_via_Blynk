@@ -12,9 +12,9 @@ char auth[] = "xx-xx"; // Blynk authentication token
 char ssid[] = "xx"; // WiFi SSID
 char pass[] = "xxxx"; // WiFi password
 
-const int relayPin1 = 2; // Relay for light source connected to D2 
-const int relayPin2 = 6; // Relay for humidifier connected to D6 
-const int DHTPin = 8; // DHT sensor connected to D8 
+const int relayPin1 = 4; // Relay for light source connected to D2 (Board number and GPIO# differs)
+const int relayPin2 = 5; // Relay for humidifier connected to D1 (Board number and GPIO# differs)
+const int DHTPin = 14; // DHT sensor connected to D5 (Board number and GPIO# differs) 
 
 DHT dht(DHTPin, DHT22);
 
@@ -25,7 +25,7 @@ void setup() {
   // Set relay pins as output
   pinMode(relayPin1, OUTPUT);
   pinMode(relayPin2, OUTPUT);
-  digitalWrite(relayPin1, HIGH); // Relay off, LOW means off for this relay, usually it's HIGH?
+  digitalWrite(relayPin1, HIGH); // Relay off
   digitalWrite(relayPin2, HIGH); // Relay off
 
   // Initialize DHT sensor
@@ -48,6 +48,7 @@ void connectToWiFi() {
     delay(500);
     Serial.print(".");
     retryCount++;
+    yield(); // Prevent watchdog reset
   }
 
   if (WiFi.status() == WL_CONNECTED) {
@@ -65,7 +66,16 @@ void connectToWiFi() {
 BLYNK_WRITE(V1) // Virtual pin V1 for light source relay
 {
   int pinValue = param.asInt(); // Get the value from the Blynk app
-  digitalWrite(relayPin1, pinValue);
+  if(param.asInt() == 1)
+  {
+    // execute this code if the switch widget is now ON
+    digitalWrite(relayPin1,LOW);  // Relay ON
+  }
+  else
+  {
+    // execute this code if the switch widget is now OFF
+    digitalWrite(relayPin1,HIGH);  // Relay off   
+  }
   Serial.println("The light is turning");
   Serial.println(pinValue);
 }
@@ -73,7 +83,16 @@ BLYNK_WRITE(V1) // Virtual pin V1 for light source relay
 BLYNK_WRITE(V2) // Virtual pin V2 for humidifier relay
 {
   int pinValue = param.asInt(); // Get the value from the Blynk app
-  digitalWrite(relayPin2, pinValue);
+  if(param.asInt() == 1)
+  {
+    // execute this code if the switch widget is now ON
+    digitalWrite(relayPin2,LOW);  // Relay ON
+  }
+  else
+  {
+    // execute this code if the switch widget is now OFF
+    digitalWrite(relayPin2,HIGH);  // Relay off  
+  }
   Serial.println("The humidifier is turning");
   Serial.println(pinValue);
 }
@@ -103,5 +122,5 @@ void loop() {
 
   Blynk.run();
   sendSensor();
-  delay(2000); // Send sensor data every 2 seconds
+  delay(2000); 
 }
